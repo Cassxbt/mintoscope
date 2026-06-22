@@ -188,6 +188,7 @@ function fallbackFinding(ext: ResolvedExtension): Finding {
 }
 
 export function evaluate(mint: ResolvedMint): Finding[] {
+  if (!mint.isToken2022) return [];
   const findings: Finding[] = [];
   for (const ext of mint.extensions) {
     if (ext.scope === 'account') continue;

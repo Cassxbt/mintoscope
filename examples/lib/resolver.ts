@@ -1,5 +1,6 @@
-import { Connection, PublicKey } from '@solana/web3.js';
 import type { AuthorityInfo, ExtensionScope } from './types';
+
+const BASE58_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
 
 export const TOKEN_2022_PROGRAM_ID = 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb';
 export const TOKEN_PROGRAM_ID = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
@@ -93,16 +94,37 @@ export function interpretParsedMint(address: string, account: ParsedMintAccount)
 }
 
 export async function fetchParsedMint(rpcUrl: string, address: string): Promise<ParsedMintAccount> {
-  const connection = new Connection(rpcUrl, 'confirmed');
-  const res = await connection.getParsedAccountInfo(new PublicKey(address));
-  if (!res.value) throw new Error(`account not found: ${address}`);
-  const data = res.value.data;
-  if (!('parsed' in data)) throw new Error(`account is not a parsed SPL token mint: ${address}`);
-  const parsed = data.parsed as { type?: string; info?: ParsedMintAccount['info'] };
+  if (!BASE58_RE.test(address)) throw new Error(`invalid mint address: ${address}`);
+
+  const resp = await fetch(rpcUrl, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      jsonrpc: '2.0',
+      id: 1,
+      method: 'getAccountInfo',
+      params: [address, { encoding: 'jsonParsed' }],
+    }),
+  });
+  if (!resp.ok) throw new Error(`RPC ${resp.status} for ${address}`);
+
+  const json = (await resp.json()) as {
+    result?: { value?: { owner: string; data: unknown } | null };
+    error?: { message: string };
+  };
+  if (json.error) throw new Error(`RPC error: ${json.error.message}`);
+
+  const value = json.result?.value;
+  if (!value) throw new Error(`account not found: ${address}`);
+  const data = value.data;
+  if (!data || typeof data !== 'object' || !('parsed' in data)) {
+    throw new Error(`account is not a parsed SPL token mint: ${address}`);
+  }
+  const parsed = (data as { parsed: { type?: string; info?: ParsedMintAccount['info'] } }).parsed;
   if (parsed.type && parsed.type !== 'mint') {
     throw new Error(`account is a "${parsed.type}", not a mint: ${address}`);
   }
-  return { owner: res.value.owner.toBase58(), info: parsed.info ?? {} };
+  return { owner: value.owner, info: parsed.info ?? {} };
 }
 
 export async function resolveMint(rpcUrl: string, address: string): Promise<ResolvedMint> {
