@@ -1,0 +1,10 @@
+{
+  "owner": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "info": {
+    "decimals": 6,
+    "mintAuthority": null,
+    "freezeAuthority": null,
+    "isInitialized": true,
+    "supply": "1000000000"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "owner": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "info": {
+    "decimals": 9,
+    "mintAuthority": "Boss11111111111111111111111111111111111111",
+    "freezeAuthority": null,
+    "isInitialized": true,
+    "supply": "1000000000",
+    "extensions": [
+      {
+        "extension": "transferFeeConfig",
+        "state": {
+          "transferFeeConfigAuthority": "FeeAuth1111111111111111111111111111111111",
+          "withdrawWithheldAuthority": "FeeAuth1111111111111111111111111111111111",
+          "newerTransferFee": { "epoch": 700, "maximumFee": 1000000000, "transferFeeBasisPoints": 1000 },
+          "olderTransferFee": { "epoch": 699, "maximumFee": 0, "transferFeeBasisPoints": 0 },
+          "withheldAmount": 0
+        }
+      }
+    ]
+  }
+}
