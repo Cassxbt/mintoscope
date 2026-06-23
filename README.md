@@ -1,34 +1,47 @@
 # Mintoscope
 
-> Token-2022 extension risk auditor for Solana — a Claude Code / Codex skill.
+**A Claude Code / Codex skill that audits Solana Token-2022 mints for configuration risk — before you integrate one, or before you ship your own.**
 
-Mintoscope audits the **configuration** of a Solana Token-2022 mint: which extensions are present, who controls them (live vs. renounced authorities), what can go wrong, and how to fix it. It returns a `SAFE / CAUTION / HIGH / CRITICAL` verdict with specific remediations — in two modes:
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) &nbsp;·&nbsp; ![runtime deps: 0](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg) &nbsp;·&nbsp; ![Claude Code / Codex](https://img.shields.io/badge/Claude%20Code%20%2F%20Codex-skill-8A2BE2.svg)
 
-- **Post-deploy** — point it at any mint address.
-- **Pre-deploy** — guided review of your token-creation code before launch.
+Built by [@cassxbt](https://github.com/cassxbt), validated live against mainnet. Token-2022 extensions add powerful optional behaviors to a mint — several are fund-loss-grade when an authority is live or misconfigured (`PermanentDelegate` can seize balances, `TransferHook` can block transfers, `TransferFeeConfig` can be raised to 100%, `PausableConfig` can halt all transfers). Mintoscope audits that surface — the one no existing kit skill covers.
 
-Mint-configuration risk only — it complements, rather than duplicates, program-logic auditors and trader-facing scanners.
+## What it does
 
-## Why it exists
+Given a mint address (post-deploy) or your token-creation code (pre-deploy), it produces a `RiskReport` that:
 
-Token-2022 extensions add powerful optional behaviors to a mint, several of which are fund-loss-grade when an authority is live or misconfigured: `PermanentDelegate` can seize any balance, `TransferHook` can block or hijack transfers, `TransferFeeConfig` can be raised to 100%, `PausableConfig` can halt all transfers. Builders ship these by accident; integrators get caught by hidden ones — and nothing audits this surface inside the coding loop.
+- Lists every Token-2022 extension present and what it means.
+- Names the exact controlling authority for each, and whether it is **live** (active) or **renounced** (null).
+- Scores severity *conditionally* — a renounced `PermanentDelegate` is inert; a live one is `CRITICAL`.
+- Flags extension combinations conservatively — never asserting "illegal" without program-source proof.
+- Returns markdown or JSON, with a concrete remediation per finding.
 
-| Existing tool | Covers | What Mintoscope adds |
-|---|---|---|
-| SendAI `birdeye` token-security | ~7 coarse post-deploy API flags | Full mint-extension set, per-authority decomposition, severity tiers, pre-deploy review |
-| Trail of Bits `token-integration-analyzer` | EVM / ERC-20 | The Solana Token-2022 domain |
-| Solana Foundation `token-2022` reference | How to *build* with extensions | Risk-first auditing, detection, and scoring |
+## Who it's for
 
-## Install
+- **Integrators, exchanges, wallets** deciding whether a token is safe to list or accept.
+- **Builders** hardening their own token before mainnet.
+- **Security researchers** triaging a mint's authority surface in seconds.
+
+## How it works
+
+1. Reads the mint via Solana RPC `getAccountInfo` (`jsonParsed`) — the validator parses every extension the cluster supports, so coverage stays version-proof.
+2. Decomposes authorities: live (non-null) vs. renounced (null). Severity depends on this, not on mere presence.
+3. Detects combinations conservatively. Real mints (PYUSD carries `ConfidentialTransferMint` + `TransferHook`) disprove several commonly-repeated "incompatible" claims, so those are flagged version-dependent / manual-review rather than illegal.
+4. Scores: severity tier (primary) + 0–100 (secondary).
+
+The interpreter is a pure function, unit-tested against captured-mainnet and crafted fixtures; only the RPC fetch touches the network.
+
+## Requirements
+
+- Node.js 18+ (uses native `fetch`).
+- A Solana RPC URL (defaults to mainnet-beta; a dedicated RPC such as Helius avoids public rate limits).
+- Claude Code or Codex, to use it as a skill.
+
+## Installation
 
 ```bash
 git clone https://github.com/Cassxbt/mintoscope && cd mintoscope
 npm install
-```
-
-Add the skill to a Claude Code / Codex agent:
-
-```bash
 bash install.sh   # copies skill/ into ~/.claude/skills (and ~/.codex, ~/.agents if present)
 ```
 
@@ -36,13 +49,13 @@ bash install.sh   # copies skill/ into ~/.claude/skills (and ~/.codex, ~/.agents
 
 ```bash
 npm run audit -- <MINT_ADDRESS>                       # markdown report
-npm run audit -- <MINT_ADDRESS> --json                # machine-readable
+npm run audit -- <MINT_ADDRESS> --json                # JSON
 SOLANA_RPC_URL=<rpc> npm run audit -- <MINT_ADDRESS>  # custom RPC
 ```
 
-### Example (real mainnet)
+As a skill, ask the agent: *"Audit Token-2022 mint `<address>`"* or *"Review my token's extensions before I deploy."*
 
-PayPal USD (PYUSD) audits as **CRITICAL** — the issuer holds a live `PermanentDelegate` plus freeze/close/fee/hook authorities under a single key. Legitimate compliance controls, but full capability over holder funds:
+### Example — PYUSD (real mainnet)
 
 ```
 **Verdict:** CRITICAL (score 99/100)
@@ -53,9 +66,11 @@ PayPal USD (PYUSD) audits as **CRITICAL** — the issuer holds a live `Permanent
 - Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
 ```
 
-`CRITICAL` means *capability*, not intent — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller.
+PYUSD audits `CRITICAL` because Paxos holds live seize/freeze/close authorities for compliance. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller.
 
-## Validation (live mainnet — `npm run validate`)
+## Validation
+
+`npm run validate` — each row is checked live on mainnet (the auditor self-verifies the program owner, so this reflects on-chain truth, not assumptions):
 
 | Mint | Program | Verdict | Extensions |
 |---|---|---|---|
@@ -68,36 +83,46 @@ PayPal USD (PYUSD) audits as **CRITICAL** — the issuer holds a live `Permanent
 
 Classic SPL mints are correctly out of scope (no false positives); the Token-2022 case is decomposed in full.
 
-## How it works
+## How it compares
 
-1. Reads the mint via RPC `getAccountInfo` (`jsonParsed`) — the validator parses every extension the cluster supports, so coverage is version-proof.
-2. Decomposes each extension's authorities: live (non-null) vs. renounced (null). Severity is conditional on this, not on mere presence.
-3. Detects extension combinations **conservatively** — nothing is asserted "illegal" without program-source proof. Real mints such as PYUSD carry `ConfidentialTransferMint` + `TransferHook` together, disproving a commonly-repeated incompatibility claim, so such pairs are flagged version-dependent / manual-review instead.
-4. Scores: severity tier (primary), 0–100 (secondary).
+| Tool | Covers | Mintoscope adds |
+|---|---|---|
+| SendAI `birdeye` token-security | ~7 coarse post-deploy API flags | Full mint-extension set, per-authority decomposition, severity tiers, pre-deploy review |
+| Trail of Bits `token-integration-analyzer` | EVM / ERC-20 | The Solana Token-2022 domain |
+| Solana Foundation `token-2022` reference | How to *build* with extensions | Risk-first auditing, detection, scoring |
 
-The interpreter is a pure function, unit-tested against captured-mainnet and crafted fixtures; only the RPC fetch touches the network.
+## What it doesn't do
+
+- **Program / Anchor logic** vulnerabilities → use Trail of Bits `solana-vulnerability-scanner`.
+- **Price, liquidity, holder distribution, honeypot-trading** risk → use a market scanner such as `birdeye`.
+- **Trust decisions** — it reports an authority's capability; it does not judge whether the controller is trustworthy.
+
+## Known limitations
+
+- Combination classifications are deliberately conservative; promoting a pair to `illegal` requires verifying rejection in the Token-2022 program source (tracked, not yet done).
+- Pre-deploy mode is a guided review — the agent reads your source against the risk matrix — not a static parser.
+- The extension set is current as of 2026-06; an unrecognized future extension is surfaced for manual review rather than ignored.
 
 ## Security posture
 
 - **Zero runtime dependencies** — reads chain state via native `fetch`; no wallet, no keys, no bundled executables.
 - **Clean `npm audit`** (0 advisories).
-- Read-only. Informational, not financial or security advice; verify on-chain before acting. Extension set current as of 2026-06.
+- Read-only. Informational, not financial or security advice; verify on-chain before acting.
 
 ## Project layout
 
 ```
 skill/
   SKILL.md                  progressive, token-efficient router
-  post-deploy-audit.md
-  pre-deploy-review.md
-  resources/                extension-risk-matrix, incompatible-combinations, fix-templates
+  post-deploy-audit.md · pre-deploy-review.md
+  resources/                extension-risk-matrix · incompatible-combinations · fix-templates
 examples/
   audit-deployed.ts         runnable auditor
   validate.ts               mainnet validation
-  lib/                      resolver, rules, combos, score, report (+ tests)
+  lib/                      resolver · rules · combos · score · report (+ tests)
 skill-registry.entry.json   entry for the Solana AI Kit registry
 ```
 
 ## License
 
-MIT
+MIT © [cassxbt](https://github.com/cassxbt)
