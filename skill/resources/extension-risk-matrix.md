@@ -19,6 +19,11 @@ Severity is conditional on authority state: a **live** (non-null) authority is w
 | TokenMetadata | `updateAuthority` | CAUTION | Mutable name/symbol/URI → impersonation |
 | NonTransferable | — | CAUTION | Soulbound; confirm it is intended |
 
+| GroupPointer / GroupMemberPointer | `authority` | CAUTION | A live authority can repoint group references |
+| TokenGroup | `updateAuthority` | CAUTION | A live authority can change group membership rules |
+| ConfidentialMintBurn | — | CAUTION (manual review) | Confidential mint/burn; must accompany `ConfidentialTransferMint` (see combinations) |
+| PermissionedBurn | — | CAUTION (manual review) | Only a designated authority may burn; verify that authority |
+
 ## Account-level extensions (advisory only — not on the mint)
 `MemoTransfer`, `CpiGuard`, `ImmutableOwner` live on token accounts. They never appear when auditing a mint; surface them only as integrator advisories. `ImmutableOwner` is beneficial (phishing protection).
 
