@@ -81,7 +81,7 @@ PYUSD audits `CRITICAL` because Paxos holds live seize/freeze/close authorities 
 | wSOL | classic SPL | SAFE | — |
 | JUP | classic SPL | SAFE | — |
 
-Classic SPL mints are correctly out of scope (no false positives); the Token-2022 case is decomposed in full.
+PYUSD is the richest real-world Token-2022 case (8 extensions); the classic-SPL rows are negative controls confirming no false positives. Beyond live mints, the test suite exercises the full severity matrix against crafted fixtures — renounced authorities downgrading to SAFE, `PausableConfig` → CRITICAL, frozen-by-default → HIGH, and the five program-verified illegal combinations. Run `npm run validate -- <MINT> <MINT> …` to audit any set of mints.
 
 ## How it compares
 

@@ -3,9 +3,9 @@ import { buildReport } from './lib/report';
 
 const RPC = process.env.SOLANA_RPC_URL ?? 'https://api.mainnet-beta.solana.com';
 
-// Real mainnet mints. The auditor self-verifies the program owner, so each row
-// reflects on-chain truth (Token-2022 vs classic SPL), not an assumption.
-const MINTS: Array<[string, string]> = [
+// Default real mainnet mints. The auditor self-verifies the program owner, so each
+// row reflects on-chain truth. Pass mint addresses as CLI args to audit your own set.
+const DEFAULTS: Array<[string, string]> = [
   ['PYUSD', '2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo'],
   ['USDC', 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'],
   ['USDT', 'Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB'],
@@ -14,9 +14,12 @@ const MINTS: Array<[string, string]> = [
   ['JUP', 'JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN'],
 ];
 
+const cli = process.argv.slice(2);
+const targets: Array<[string, string]> = cli.length ? cli.map((a) => [a.slice(0, 6), a]) : DEFAULTS;
+
 console.log('Mint   | Program      | Severity | Sc  | Extensions');
 console.log('-------|--------------|----------|-----|-----------');
-for (const [label, addr] of MINTS) {
+for (const [label, addr] of targets) {
   try {
     const mint = await resolveMint(RPC, addr);
     const report = buildReport(mint);
