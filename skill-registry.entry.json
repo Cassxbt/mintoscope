@@ -8,7 +8,7 @@
   "install": { "method": "bash", "command": "bash install.sh", "env": ["SOLANA_RPC_URL (optional)"] },
   "license": "MIT",
   "maintainer": "cassxbt",
-  "signal": { "stars": 0, "last_commit": "2026-06-22", "reputability": "individual" },
+  "signal": { "last_commit": "2026-06-23" },
   "default_installed": false,
   "safety": "clean (RPC reads only; no executables bundled, no keys required)",
   "tags": ["token-2022", "token-extensions", "security", "audit", "permanent-delegate", "transfer-hook", "transfer-fee", "mint-risk", "rug-check"]
