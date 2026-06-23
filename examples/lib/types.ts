@@ -14,7 +14,7 @@ export interface Finding {
   scope: ExtensionScope;
   whatItIs: string;
   whyRisky: string;
-  authority?: AuthorityInfo;
+  authorities?: AuthorityInfo[];
   remediation: string;
 }
 

@@ -6,10 +6,6 @@ function anyLive(ext: ResolvedExtension, field?: string): boolean {
   return list.some((a) => a.live);
 }
 
-function authorityOf(ext: ResolvedExtension, field?: string) {
-  return field ? ext.authorities.find((a) => a.field === field) : ext.authorities[0];
-}
-
 function feeBps(ext: ResolvedExtension): number {
   const read = (key: string) =>
     Number((ext.detail[key] as { transferFeeBasisPoints?: number } | undefined)?.transferFeeBasisPoints ?? 0);
@@ -27,7 +23,6 @@ const RULES: Record<string, Rule> = {
     whyRisky: anyLive(e)
       ? 'The delegate can seize or burn any holder balance — full fund-seizure capability.'
       : 'The delegate is renounced; the capability is inert.',
-    authority: authorityOf(e, 'delegate'),
     remediation: 'Renounce the permanent delegate unless seizure is an intended, disclosed feature.',
   }),
   PausableConfig: (e) => ({
@@ -38,7 +33,6 @@ const RULES: Record<string, Rule> = {
     whyRisky: anyLive(e)
       ? 'The pause authority can halt every transfer at will — total operational freeze.'
       : 'The pause authority is renounced.',
-    authority: authorityOf(e, 'authority'),
     remediation: 'Renounce the pause authority or place it behind a timelock/multisig.',
   }),
   TransferHook: (e) => {
@@ -53,7 +47,6 @@ const RULES: Record<string, Rule> = {
         : programId
           ? 'A hook program is active; transfers depend on its (unverified) logic.'
           : 'No hook program is set and the authority is renounced.',
-      authority: authorityOf(e, 'authority'),
       remediation: 'Renounce the hook authority and verify any active hook program before integrating.',
     };
   },
@@ -71,7 +64,6 @@ const RULES: Record<string, Rule> = {
         : bps > 0
           ? 'A fixed fee reduces every transfer; integrations must be fee-aware.'
           : 'No active fee and the authority is renounced.',
-      authority: authorityOf(e, 'transferFeeConfigAuthority'),
       remediation: 'Renounce the fee-config authority and disclose a capped fee.',
     };
   },
@@ -83,7 +75,6 @@ const RULES: Record<string, Rule> = {
     whyRisky: anyLive(e)
       ? 'A closed mint can be reinitialized with different rules, bypassing fee/freeze/soulbound assumptions.'
       : 'The close authority is renounced.',
-    authority: authorityOf(e, 'closeAuthority'),
     remediation: 'Renounce the mint close authority for a fixed, immutable mint.',
   }),
   ConfidentialTransferMint: (e) => ({
@@ -92,7 +83,6 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e) ? 'CAUTION' : 'SAFE',
     whatItIs: 'Enables encrypted transfer amounts; may designate an auditor key.',
     whyRisky: 'The authority controls account approval and config; an auditor key (if set) can view amounts.',
-    authority: authorityOf(e, 'authority'),
     remediation: 'Confirm the auditor key and approval policy match your privacy expectations.',
   }),
   ConfidentialTransferFeeConfig: (e) => ({
@@ -101,7 +91,6 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e) ? 'CAUTION' : 'SAFE',
     whatItIs: 'Withheld-fee configuration for confidential transfers.',
     whyRisky: 'A live authority controls withheld confidential fees.',
-    authority: authorityOf(e, 'authority'),
     remediation: 'Confirm the authority is trusted or renounced.',
   }),
   DefaultAccountState: (e) => {
@@ -124,7 +113,6 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e, 'rateAuthority') ? 'CAUTION' : 'SAFE',
     whatItIs: 'Displays a UI-only accruing balance; the on-chain amount is unchanged.',
     whyRisky: 'A live rate authority can change the displayed rate; never trust uiAmount for accounting.',
-    authority: authorityOf(e, 'rateAuthority'),
     remediation: 'Use raw amounts, not uiAmount, for any value calculation.',
   }),
   ScaledUiAmountConfig: (e) => ({
@@ -133,7 +121,6 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e) ? 'CAUTION' : 'SAFE',
     whatItIs: 'Applies a UI-only multiplier to displayed balances.',
     whyRisky: 'A live authority can change the multiplier; never trust uiAmount for accounting.',
-    authority: authorityOf(e, 'authority'),
     remediation: 'Use raw amounts, not uiAmount, for any value calculation.',
   }),
   MetadataPointer: (e) => ({
@@ -142,7 +129,6 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e) ? 'CAUTION' : 'SAFE',
     whatItIs: 'Points to the token’s metadata location.',
     whyRisky: 'A live authority can repoint metadata; verify the pointer references this mint.',
-    authority: authorityOf(e, 'authority'),
     remediation: 'Confirm the pointer is self-referential and the authority is trusted or renounced.',
   }),
   TokenMetadata: (e) => ({
@@ -151,8 +137,31 @@ const RULES: Record<string, Rule> = {
     level: anyLive(e, 'updateAuthority') ? 'CAUTION' : 'SAFE',
     whatItIs: 'On-chain name, symbol, and URI for the token.',
     whyRisky: 'A live update authority can change name/symbol/URI — a vector for impersonation.',
-    authority: authorityOf(e, 'updateAuthority'),
     remediation: 'Renounce the metadata update authority once final.',
+  }),
+  GroupPointer: (e) => ({
+    extension: 'GroupPointer',
+    scope: 'mint',
+    level: anyLive(e) ? 'CAUTION' : 'SAFE',
+    whatItIs: 'Points to a token-group account this mint belongs to or governs.',
+    whyRisky: 'A live authority can repoint the group reference.',
+    remediation: 'Confirm the group pointer and authority are intended.',
+  }),
+  GroupMemberPointer: (e) => ({
+    extension: 'GroupMemberPointer',
+    scope: 'mint',
+    level: anyLive(e) ? 'CAUTION' : 'SAFE',
+    whatItIs: 'Points to the group-member account for this mint.',
+    whyRisky: 'A live authority can repoint the member reference.',
+    remediation: 'Confirm the member pointer and authority are intended.',
+  }),
+  TokenGroup: (e) => ({
+    extension: 'TokenGroup',
+    scope: 'mint',
+    level: anyLive(e, 'updateAuthority') ? 'CAUTION' : 'SAFE',
+    whatItIs: 'On-chain group configuration (max size, current members).',
+    whyRisky: 'A live update authority can change group membership rules.',
+    remediation: 'Renounce the group update authority once the group is final.',
   }),
   NonTransferable: () => ({
     extension: 'NonTransferable',
@@ -171,7 +180,7 @@ function baseFreezeFinding(value: string): Finding {
     level: 'HIGH',
     whatItIs: 'Standard authority that can freeze individual token accounts.',
     whyRisky: 'Any holder account can be frozen at will, trapping funds.',
-    authority: { field: 'freezeAuthority', value, live: true },
+    authorities: [{ field: 'freezeAuthority', value, live: true }],
     remediation: 'Renounce the freeze authority unless freezing is a required, disclosed control.',
   };
 }
@@ -183,7 +192,6 @@ function fallbackFinding(ext: ResolvedExtension): Finding {
     level: anyLive(ext) ? 'CAUTION' : 'SAFE',
     whatItIs: 'Token-2022 extension not individually rule-scored.',
     whyRisky: 'Review this extension manually against the Token Extensions documentation.',
-    authority: authorityOf(ext),
     remediation: 'Inspect the extension state and confirm its authorities are trusted or renounced.',
   };
 }
@@ -194,7 +202,8 @@ export function evaluate(mint: ResolvedMint): Finding[] {
   for (const ext of mint.extensions) {
     if (ext.scope === 'account') continue;
     const rule = RULES[ext.type];
-    findings.push(rule ? rule(ext) : fallbackFinding(ext));
+    const finding = rule ? rule(ext) : fallbackFinding(ext);
+    findings.push({ ...finding, authorities: ext.authorities });
   }
   if (mint.baseFreezeAuthority) findings.push(baseFreezeFinding(mint.baseFreezeAuthority));
   return findings;

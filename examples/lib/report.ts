@@ -55,9 +55,8 @@ export function renderMarkdown(r: RiskReport): string {
       out.push(`### [${f.level}] ${f.extension}`);
       out.push(`- What: ${f.whatItIs}`);
       out.push(`- Risk: ${f.whyRisky}`);
-      if (f.authority) {
-        const state = f.authority.live ? 'live' : 'renounced';
-        out.push(`- Authority: ${f.authority.field} = ${f.authority.value ?? 'none'} (${state})`);
+      for (const a of f.authorities ?? []) {
+        out.push(`- Authority: ${a.field} = ${a.value ?? 'none'} (${a.live ? 'live' : 'renounced'})`);
       }
       out.push(`- Fix: ${f.remediation}`, '');
     }
