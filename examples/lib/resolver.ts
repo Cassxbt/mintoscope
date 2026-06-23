@@ -47,6 +47,8 @@ const REGISTRY: Record<string, ExtSpec> = {
   mintCloseAuthority: { name: 'MintCloseAuthority', scope: 'mint', authorityFields: ['closeAuthority'] },
   confidentialTransferMint: { name: 'ConfidentialTransferMint', scope: 'mint', authorityFields: ['authority'] },
   confidentialTransferFeeConfig: { name: 'ConfidentialTransferFeeConfig', scope: 'mint', authorityFields: ['authority'] },
+  confidentialMintBurn: { name: 'ConfidentialMintBurn', scope: 'mint', authorityFields: [] },
+  permissionedBurn: { name: 'PermissionedBurn', scope: 'mint', authorityFields: [] },
   defaultAccountState: { name: 'DefaultAccountState', scope: 'mint', authorityFields: [] },
   interestBearingConfig: { name: 'InterestBearingConfig', scope: 'mint', authorityFields: ['rateAuthority'] },
   scaledUiAmountConfig: { name: 'ScaledUiAmountConfig', scope: 'mint', authorityFields: ['authority'] },

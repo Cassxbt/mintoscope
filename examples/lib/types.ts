@@ -1,6 +1,6 @@
 export type Severity = 'SAFE' | 'CAUTION' | 'HIGH' | 'CRITICAL';
 export type ExtensionScope = 'mint' | 'account';
-export type ComboClass = 'illegal' | 'version-dependent' | 'manual-review' | 'dangerous-legal';
+export type ComboClass = 'illegal' | 'dangerous-legal';
 
 export interface AuthorityInfo {
   field: string;

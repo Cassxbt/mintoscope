@@ -1,16 +1,24 @@
 # Extension Combinations
 
-Classification is conservative: nothing is asserted **illegal** unless verified against the Token-2022 program source. Real mainnet mints disprove several commonly-repeated incompatibility claims — e.g. **PYUSD carries `ConfidentialTransferMint` + `TransferHook` together** — so those are `version-dependent` or `manual-review`, never a hard reject.
+The illegal combinations below are taken verbatim from the Token-2022 program's `check_for_invalid_mint_extension_combinations` — mint initialization rejects them on-chain. The dangerous-but-legal pairs are accepted by the program but warrant a warning.
 
-| Combination | Classification | Note |
-|---|---|---|
-| NonTransferable + TransferFeeConfig | manual-review | Logically conflicting (no transfers to charge); not verified against source |
-| NonTransferable + TransferHook | manual-review | Logically conflicting (no transfers to hook); not verified against source |
-| ConfidentialTransferMint + TransferHook | version-dependent | PYUSD carries both; depends on version/activation |
-| ConfidentialTransferMint + TransferFeeConfig | version-dependent | Historically incompatible; depends on runtime version |
-| MintCloseAuthority + NonTransferable | dangerous-legal | Close + reinit can drop NonTransferable, making a soulbound token transferable |
-| MintCloseAuthority + DefaultAccountState (frozen) | dangerous-legal | Accounts created before a close+reinit bypass the frozen default |
-| ConfidentialTransferMint + PermanentDelegate | manual-review | Encrypted amounts vs. forced transfers — interaction unverified |
-| NonTransferable + PermanentDelegate | manual-review | Soulbound vs. forced transfer — interaction unverified |
+## Illegal (rejected at mint init)
 
-To promote a pair to `illegal`, verify that the Token-2022 program rejects it at mint initialization, then update `combos.ts` and this table together.
+| Condition | Why |
+|---|---|
+| `ConfidentialTransferFeeConfig` without both `TransferFeeConfig` and `ConfidentialTransferMint` | Fee-config for confidential transfers has nothing to attach to |
+| `TransferFeeConfig` + `ConfidentialTransferMint` without `ConfidentialTransferFeeConfig` | A confidential fee-config is required for the pair |
+| `ConfidentialMintBurn` without `ConfidentialTransferMint` | Confidential mint/burn extends confidential transfers |
+| `ScaledUiAmountConfig` + `InterestBearingConfig` | Two competing UI-amount rescalers cannot coexist |
+| `NonTransferable` + `ConfidentialTransferMint` without `ConfidentialMintBurn` | Confidential balances on a non-transferable token need confidential mint/burn |
+
+Note: the `TransferFeeConfig + ConfidentialTransferMint + ConfidentialTransferFeeConfig` trio **is** legal together — PYUSD ships exactly this. The rule fires only when the required third extension is absent.
+
+## Dangerous but legal
+
+| Combination | Why |
+|---|---|
+| `MintCloseAuthority` + `NonTransferable` | Close + reinitialize can drop NonTransferable, making a soulbound token transferable |
+| `MintCloseAuthority` + `DefaultAccountState` (frozen) | Accounts created before a close + reinit bypass the frozen-by-default state |
+
+Source: `solana-program/token-2022` `interface/src/extension/mod.rs` — `check_for_invalid_mint_extension_combinations`.

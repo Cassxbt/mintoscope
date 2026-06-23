@@ -11,8 +11,9 @@ function authorityOf(ext: ResolvedExtension, field?: string) {
 }
 
 function feeBps(ext: ResolvedExtension): number {
-  const newer = ext.detail.newerTransferFee as { transferFeeBasisPoints?: number } | undefined;
-  return Number(newer?.transferFeeBasisPoints ?? 0);
+  const read = (key: string) =>
+    Number((ext.detail[key] as { transferFeeBasisPoints?: number } | undefined)?.transferFeeBasisPoints ?? 0);
+  return Math.max(read('newerTransferFee'), read('olderTransferFee'));
 }
 
 type Rule = (ext: ResolvedExtension) => Finding;

@@ -12,18 +12,35 @@ function mintWith(extensions: string[]): ParsedMintAccount {
 }
 
 describe('detectCombos', () => {
-  it('flags NonTransferable + TransferFeeConfig for manual review, not as illegal', () => {
-    const flags = detectCombos(interpretParsedMint('x', mintWith(['nonTransferable', 'transferFeeConfig'])));
-    const flag = flags.find((f) => f.combo.includes('NonTransferable') && f.combo.includes('TransferFeeConfig'));
-    expect(flag!.classification).toBe('manual-review');
+  it('PYUSD carries the legal TransferFee + Confidential + ConfidentialFee trio → no illegal flags', () => {
+    const flags = detectCombos(interpretParsedMint('pyusd', pyusd as ParsedMintAccount));
+    expect(flags.every((f) => f.classification !== 'illegal')).toBe(true);
   });
 
-  it('does NOT mark any combo illegal on PYUSD, a real valid mint (no false positives)', () => {
-    const flags = detectCombos(interpretParsedMint('pyusd', pyusd as ParsedMintAccount));
-    const confidentialHook = flags.find(
-      (f) => f.combo.includes('ConfidentialTransferMint') && f.combo.includes('TransferHook'),
+  it('TransferFee + ConfidentialTransferMint WITHOUT ConfidentialTransferFeeConfig → illegal', () => {
+    const flags = detectCombos(interpretParsedMint('x', mintWith(['transferFeeConfig', 'confidentialTransferMint'])));
+    expect(flags.some((f) => f.classification === 'illegal')).toBe(true);
+  });
+
+  it('adding ConfidentialTransferFeeConfig makes that trio legal again', () => {
+    const flags = detectCombos(
+      interpretParsedMint('x', mintWith(['transferFeeConfig', 'confidentialTransferMint', 'confidentialTransferFeeConfig'])),
     );
-    expect(confidentialHook!.classification).toBe('version-dependent');
-    expect(flags.every((f) => f.classification !== 'illegal')).toBe(true);
+    expect(flags.some((f) => f.classification === 'illegal')).toBe(false);
+  });
+
+  it('ScaledUiAmount + InterestBearing → illegal', () => {
+    const flags = detectCombos(interpretParsedMint('x', mintWith(['scaledUiAmountConfig', 'interestBearingConfig'])));
+    expect(flags.some((f) => f.classification === 'illegal')).toBe(true);
+  });
+
+  it('ConfidentialMintBurn without ConfidentialTransferMint → illegal', () => {
+    const flags = detectCombos(interpretParsedMint('x', mintWith(['confidentialMintBurn'])));
+    expect(flags.some((f) => f.classification === 'illegal')).toBe(true);
+  });
+
+  it('MintCloseAuthority + NonTransferable → dangerous-legal', () => {
+    const flags = detectCombos(interpretParsedMint('x', mintWith(['mintCloseAuthority', 'nonTransferable'])));
+    expect(flags.some((f) => f.classification === 'dangerous-legal')).toBe(true);
   });
 });
