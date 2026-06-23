@@ -189,6 +189,18 @@ const RULES: Record<string, Rule> = {
   }),
 };
 
+function baseMintAuthorityFinding(value: string): Finding {
+  return {
+    extension: 'MintAuthority',
+    scope: 'mint',
+    level: 'HIGH',
+    whatItIs: 'The authority that can mint new supply of this token.',
+    whyRisky: 'A live mint authority can inflate supply without limit, diluting every holder.',
+    authorities: [{ field: 'mintAuthority', value, live: true }],
+    remediation: 'Renounce the mint authority for a fixed-supply token, or disclose the minting policy.',
+  };
+}
+
 function baseFreezeFinding(value: string): Finding {
   return {
     extension: 'FreezeAuthority',
@@ -221,6 +233,7 @@ export function evaluate(mint: ResolvedMint): Finding[] {
     const finding = rule ? rule(ext) : fallbackFinding(ext);
     findings.push({ ...finding, authorities: ext.authorities });
   }
+  if (mint.baseMintAuthority) findings.push(baseMintAuthorityFinding(mint.baseMintAuthority));
   if (mint.baseFreezeAuthority) findings.push(baseFreezeFinding(mint.baseFreezeAuthority));
   return findings;
 }

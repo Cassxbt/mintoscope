@@ -71,4 +71,9 @@ describe('evaluate + score', () => {
     const findings = evaluate(interpretParsedMint('x', t22([], { freezeAuthority: A })));
     expect(findings.find((f) => f.extension === 'FreezeAuthority')!.level).toBe('HIGH');
   });
+
+  it('a live base mint authority on a Token-2022 mint is reported HIGH', () => {
+    const findings = evaluate(interpretParsedMint('x', t22([], { mintAuthority: A })));
+    expect(findings.find((f) => f.extension === 'MintAuthority')!.level).toBe('HIGH');
+  });
 });
