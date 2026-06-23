@@ -99,7 +99,7 @@ PYUSD is the richest real-world Token-2022 case (8 extensions); the classic-SPL 
 
 ## Known limitations
 
-- Combination classifications are deliberately conservative; promoting a pair to `illegal` requires verifying rejection in the Token-2022 program source (tracked, not yet done).
+- Illegal-combination detection mirrors the Token-2022 program's `check_for_invalid_mint_extension_combinations` (verified 2026-06); if the program adds new combination constraints, this list must be updated to match.
 - Pre-deploy mode is a guided review — the agent reads your source against the risk matrix — not a static parser.
 - The extension set is current as of 2026-06; an unrecognized future extension is surfaced for manual review rather than ignored.
 

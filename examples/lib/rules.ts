@@ -163,6 +163,22 @@ const RULES: Record<string, Rule> = {
     whyRisky: 'A live update authority can change group membership rules.',
     remediation: 'Renounce the group update authority once the group is final.',
   }),
+  ConfidentialMintBurn: () => ({
+    extension: 'ConfidentialMintBurn',
+    scope: 'mint',
+    level: 'CAUTION',
+    whatItIs: 'Confidential minting and burning; extends confidential transfers.',
+    whyRisky: 'Must accompany ConfidentialTransferMint; review its mint/burn policy and authority.',
+    remediation: 'Confirm the confidential mint/burn policy is intended.',
+  }),
+  PermissionedBurn: () => ({
+    extension: 'PermissionedBurn',
+    scope: 'mint',
+    level: 'CAUTION',
+    whatItIs: 'Only a designated authority may burn this token.',
+    whyRisky: 'A live burn authority can burn holder balances without consent — verify it.',
+    remediation: 'Verify or renounce the burn authority.',
+  }),
   NonTransferable: () => ({
     extension: 'NonTransferable',
     scope: 'mint',

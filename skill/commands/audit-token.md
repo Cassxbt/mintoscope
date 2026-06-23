@@ -5,7 +5,7 @@ argument-hint: <MINT_ADDRESS>
 
 Use the `token-2022-extension-auditor` skill to audit the mint in `$ARGUMENTS`.
 
-Run:
+Run from the mintoscope repo (clone it and run `npm install` once; the auditor script ships with the repo):
 
 ```bash
 npm run audit -- $ARGUMENTS
