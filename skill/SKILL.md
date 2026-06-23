@@ -32,7 +32,7 @@ Audits the configuration of a Solana Token-2022 mint: which extensions are prese
 ## How it works
 1. Read the mint via RPC `getAccountInfo` (`jsonParsed`) — the validator parses every extension the cluster supports.
 2. Decompose each extension's authorities: live (non-null) vs renounced (null). Severity is conditional on this.
-3. Detect dangerous / version-dependent / manual-review combinations — conservatively.
+3. Detect illegal extension combinations (verified against the Token-2022 program) plus dangerous-but-legal pairs.
 4. Score: severity tier (primary), 0–100 (secondary).
 
 ## Output
@@ -43,7 +43,7 @@ A `RiskReport`: `{ mint, severity, score, findings[], combos[], summary, disclai
 | --- | --- | --- |
 | "Extension present = dangerous" | Severity depends on whether the authority is live | Check live vs renounced |
 | "Authority renounced = safe" | A fixed harmful value (e.g. 100% fee) still harms | Inspect the value, not just the authority |
-| "These two extensions are illegal together" | Real mints (PYUSD) disprove common myths | Use the verified-only combo table; else flag manual-review |
+| "These two extensions are illegal together" | Real mints (PYUSD) disprove common myths | Use the program-verified illegal-combo list; never invent illegal pairs |
 | "CRITICAL means it's a scam" | Regulated stablecoins (PYUSD) are CRITICAL by design | Report capability + context, not intent |
 | "The mint has MemoTransfer/CpiGuard" | Those are account-level, not mint-level | Audit mint extensions; treat account ones as advisories |
 | "The score is the verdict" | Score is secondary | Lead with the severity tier and findings |

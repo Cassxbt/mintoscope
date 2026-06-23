@@ -21,4 +21,4 @@ Note: the `TransferFeeConfig + ConfidentialTransferMint + ConfidentialTransferFe
 | `MintCloseAuthority` + `NonTransferable` | Close + reinitialize can drop NonTransferable, making a soulbound token transferable |
 | `MintCloseAuthority` + `DefaultAccountState` (frozen) | Accounts created before a close + reinit bypass the frozen-by-default state |
 
-Source: `solana-program/token-2022` `interface/src/extension/mod.rs` — `check_for_invalid_mint_extension_combinations`.
+Source: [`check_for_invalid_mint_extension_combinations`](https://github.com/solana-program/token-2022/blob/main/interface/src/extension/mod.rs) in `solana-program/token-2022` (verified 2026-06).

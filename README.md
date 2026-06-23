@@ -26,7 +26,7 @@ Given a mint address (post-deploy) or your token-creation code (pre-deploy), it 
 
 1. Reads the mint via Solana RPC `getAccountInfo` (`jsonParsed`) — the validator parses every extension the cluster supports, so coverage stays version-proof.
 2. Decomposes authorities: live (non-null) vs. renounced (null). Severity depends on this, not on mere presence.
-3. Detects combinations conservatively. Real mints (PYUSD carries `ConfidentialTransferMint` + `TransferHook`) disprove several commonly-repeated "incompatible" claims, so those are flagged version-dependent / manual-review rather than illegal.
+3. Detects the extension combinations the Token-2022 program actually rejects (verified against its `check_for_invalid_mint_extension_combinations`), plus dangerous-but-legal pairs. Combinations the program allows — even unusual ones like PYUSD's `ConfidentialTransferMint` + `TransferHook` — are never flagged illegal.
 4. Scores: severity tier (primary) + 0–100 (secondary).
 
 The interpreter is a pure function, unit-tested against captured-mainnet and crafted fixtures; only the RPC fetch touches the network.
@@ -66,7 +66,7 @@ As a skill, ask the agent: *"Audit Token-2022 mint `<address>`"* or *"Review my 
 - Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
 ```
 
-PYUSD audits `CRITICAL` because Paxos holds live seize/freeze/close authorities for compliance. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller.
+PYUSD audits `CRITICAL` because Paxos holds live seize / mint / freeze / close authorities for compliance. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller. Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
 
 ## Validation
 
