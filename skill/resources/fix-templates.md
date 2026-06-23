@@ -7,7 +7,11 @@ Most remediations are: renounce an authority (set it to null) before mainnet, or
 # Disable an authority on a Token-2022 mint (irreversible).
 spl-token authorize <MINT> <AUTHORITY_TYPE> --disable
 ```
-Common `<AUTHORITY_TYPE>` values: `mint`, `freeze`, `close`, `transfer-fee-config`, `withheld-withdraw`, `permanent-delegate`, `transfer-hook-program-id`, `interest-rate`, `metadata`. (Run against the Token-2022 program; confirm the exact type names with `spl-token authorize --help` for your CLI version.)
+Valid `<AUTHORITY_TYPE>` values: `mint`, `freeze`, `close-mint`, `transfer-fee-config`, `withheld-withdraw`, `permanent-delegate`, `transfer-hook-program-id`, `interest-rate`, `group-pointer`, `group-member-pointer`, `metadata-pointer`. Confirm against `spl-token authorize --help` for your CLI version.
+
+Two gotchas:
+- Use **`close-mint`** to renounce a mint's `MintCloseAuthority`. The bare `close` type targets a token *account's* close authority, not the mint — using it silently does the wrong thing.
+- `metadata` is **not** a valid `spl-token authorize` type. To renounce the `TokenMetadata` update authority, use `spl-token update-metadata <MINT> --field UpdateAuthority --new-value null` (or the equivalent `updateField` instruction).
 
 ## Renounce an authority — @solana/spl-token (TypeScript)
 ```ts
