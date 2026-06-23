@@ -1,6 +1,6 @@
 # Mintoscope
 
-**A Claude Code / Codex skill that audits Solana Token-2022 mints for configuration risk — before you integrate one, or before you ship your own.**
+**A Claude Code / Codex skill that audits Solana Token-2022 (Token Extensions) mints for configuration risk — before you integrate one, or before you ship your own.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) &nbsp;·&nbsp; ![runtime deps: 0](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg) &nbsp;·&nbsp; ![Claude Code / Codex](https://img.shields.io/badge/Claude%20Code%20%2F%20Codex-skill-8A2BE2.svg)
 
