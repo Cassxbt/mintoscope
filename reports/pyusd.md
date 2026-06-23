@@ -1,5 +1,7 @@
 # Mintoscope — Token-2022 Risk Report
 
+> Generated sample. Reproduce with: `npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo`
+
 **Mint:** `2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo`
 **Verdict:** CRITICAL (score 100/100)
 **Summary:** CRITICAL: 8 extension(s), driven by PermanentDelegate.
@@ -70,4 +72,4 @@
 ---
 Informational only; not financial or security advice. Mintoscope audits mint configuration, not program logic or market risk. Verify on-chain before acting.
 
-_Generated 2026-06-23T04:34:31.773Z · data accurate as of 2026-06_
+_Data accurate as of 2026-06._

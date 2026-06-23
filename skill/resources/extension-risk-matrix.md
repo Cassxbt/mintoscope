@@ -11,6 +11,7 @@ Severity is conditional on authority state: a **live** (non-null) authority is w
 | TransferFeeConfig | `transferFeeConfigAuthority`, `withdrawWithheldAuthority` | HIGH | Fee changeable up to 100% (recipient pays); sweep withheld |
 | MintCloseAuthority | `closeAuthority` | HIGH | Close + reinitialize changes rules; bypass fee/freeze/soulbound |
 | FreezeAuthority (base) | `freezeAuthority` | HIGH | Freeze any account at will |
+| MintAuthority (base) | `mintAuthority` | HIGH | Mint unlimited new supply, diluting every holder |
 | DefaultAccountState (frozen) | governed by freeze authority | HIGH | New accounts frozen by default → silent integration failure |
 | ConfidentialTransferMint | `authority` (+ `auditorElgamalPubkey`) | CAUTION | Auditor key can view amounts; gated account approval |
 | InterestBearingConfig | `rateAuthority` | CAUTION | UI-only rate; phantom value if a protocol trusts `uiAmount` |

@@ -3,7 +3,7 @@
   "name": "Token-2022 Extension Auditor (Mintoscope)",
   "type": "skill",
   "domain": "security",
-  "description": "Audits Solana Token-2022 mints for configuration risk: detects every extension, decomposes authorities (live vs renounced), assigns SAFE/CAUTION/HIGH/CRITICAL severity, flags dangerous/version-dependent extension combinations, and prescribes fixes. Pre- and post-deploy. Complements solana-vulnerability-scanner (program logic) and birdeye (market risk) without overlap.",
+  "description": "Audits Solana Token-2022 mints for configuration risk: detects every extension, decomposes authorities (live vs renounced), assigns SAFE/CAUTION/HIGH/CRITICAL severity, flags illegal and dangerous-but-legal extension combinations, and prescribes fixes. Pre- and post-deploy. Complements solana-vulnerability-scanner (program logic) and birdeye (market risk) without overlap.",
   "source": "https://github.com/Cassxbt/mintoscope",
   "install": { "method": "bash", "command": "bash install.sh", "env": ["SOLANA_RPC_URL (optional)"] },
   "license": "MIT",

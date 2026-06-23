@@ -16,8 +16,8 @@ Run these from the cloned `mintoscope` repo root — `install.sh` adds the skill
 ## Reading the report
 - The **verdict** is the severity tier — lead with it. The 0–100 score is secondary.
 - Each finding states what the extension is, the risk, the exact authority (live/renounced), and the fix.
-- Combination flags are conservative: verify `version-dependent` / `manual-review` entries on your target cluster.
+- Combination flags are either `illegal` (the Token-2022 program rejects them at mint init) or `dangerous-legal` (allowed, but risky in combination).
 - **CRITICAL means capability, not intent.** PYUSD audits as CRITICAL because Paxos holds a live `PermanentDelegate` (and freeze/close) for compliance — legitimate, but you are trusting that controller.
 
 ## Example
-`2b1kV6Dk…` (PYUSD) → **CRITICAL**: live `PermanentDelegate`, `MintAuthority`, `MintCloseAuthority`, `TransferFeeConfig`, `TransferHook`, and `FreezeAuthority`, all under one Paxos key. No illegal combinations — it carries the legal TransferFee + Confidential trio.
+`2b1kV6Dk…` (PYUSD) → **CRITICAL**: live `PermanentDelegate`, `MintAuthority`, `MintCloseAuthority`, `TransferFeeConfig`, `TransferHook`, and `FreezeAuthority` — all live, issuer-controlled (two distinct authority keys; the mint authority is separate from the rest). No illegal combinations — it carries the legal TransferFee + Confidential trio.

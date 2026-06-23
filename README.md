@@ -58,7 +58,7 @@ As a skill, ask the agent: *"Audit Token-2022 mint `<address>`"* or *"Review my 
 ### Example — PYUSD (real mainnet)
 
 ```
-**Verdict:** CRITICAL (score 99/100)
+**Verdict:** CRITICAL (score 100/100)
 
 ### [CRITICAL] PermanentDelegate
 - Risk: The delegate can seize or burn any holder balance — full fund-seizure capability.
