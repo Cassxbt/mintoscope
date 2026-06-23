@@ -23,4 +23,24 @@ describe('buildReport + renderMarkdown', () => {
     expect(r.severity).toBe('SAFE');
     expect(renderMarkdown(r)).toContain('**Verdict:** SAFE');
   });
+
+  it('renders the Combination flags section for a dangerous-legal combo', () => {
+    const acct: ParsedMintAccount = {
+      owner: 'TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb',
+      info: {
+        decimals: 0,
+        extensions: [
+          { extension: 'mintCloseAuthority', state: { closeAuthority: 'A1111111111111111111111111111111111111111' } },
+          { extension: 'nonTransferable', state: {} },
+        ],
+      },
+    };
+    const r = buildReport(interpretParsedMint('x', acct));
+    expect(r.combos.some((c) => c.classification === 'dangerous-legal')).toBe(true);
+
+    const md = renderMarkdown(r);
+    expect(md).toContain('## Combination flags');
+    expect(md).toContain('dangerous-legal');
+    expect(md).toContain('MintCloseAuthority + NonTransferable');
+  });
 });

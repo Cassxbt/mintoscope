@@ -66,7 +66,7 @@ As a skill, ask the agent: *"Audit Token-2022 mint `<address>`"* or *"Review my 
 - Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
 ```
 
-PYUSD audits `CRITICAL` because Paxos holds live seize / mint / freeze / close authorities for compliance. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller. Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
+PYUSD audits `CRITICAL` because it has live seize, mint, freeze, and close authorities — the capabilities of a regulated-issuer model. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller. Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
 
 ## Validation
 

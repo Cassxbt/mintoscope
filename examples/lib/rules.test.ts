@@ -76,4 +76,21 @@ describe('evaluate + score', () => {
     const findings = evaluate(interpretParsedMint('x', t22([], { mintAuthority: A })));
     expect(findings.find((f) => f.extension === 'MintAuthority')!.level).toBe('HIGH');
   });
+
+  it('PermissionedBurn is flagged CAUTION', () => {
+    const findings = evaluate(interpretParsedMint('x', t22([{ extension: 'permissionedBurn', state: {} }])));
+    expect(findings.find((f) => f.extension === 'PermissionedBurn')!.level).toBe('CAUTION');
+  });
+
+  it('GroupPointer with a live authority is CAUTION', () => {
+    const findings = evaluate(interpretParsedMint('x', t22([{ extension: 'groupPointer', state: { authority: A } }])));
+    expect(findings.find((f) => f.extension === 'GroupPointer')!.level).toBe('CAUTION');
+  });
+
+  it('an unrecognized future extension falls back to a review finding', () => {
+    const findings = evaluate(interpretParsedMint('x', t22([{ extension: 'someFutureExtension', state: {} }])));
+    const f = findings.find((x) => x.extension === 'someFutureExtension');
+    expect(f).toBeDefined();
+    expect(['SAFE', 'CAUTION']).toContain(f!.level);
+  });
 });

@@ -1,6 +1,6 @@
 # Mintoscope — Token-2022 Risk Report
 
-> Generated sample. Reproduce with: `npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo`
+> Sample generated from: `npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo` — timestamp removed for diff stability.
 
 **Mint:** `2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo`
 **Verdict:** CRITICAL (score 100/100)
