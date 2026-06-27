@@ -10,24 +10,7 @@ Zero runtime dependencies · illegal-combo rules pinned to the Token-2022 progra
 
 ![Mintoscope audit demo](docs/demo.svg)
 
-```text
-$ npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo
-
-**Verdict:** CRITICAL (score 100/100)
-
-### [CRITICAL] PermanentDelegate
-- Risk: The delegate can seize or burn any holder balance — full fund-seizure capability.
-- Authority: delegate = 2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk (live)
-- Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
-
-### [HIGH] MintAuthority
-### [HIGH] MintCloseAuthority
-### [HIGH] TransferFeeConfig
-### [HIGH] TransferHook
-### [HIGH] FreezeAuthority
-…  (full report: reports/pyusd.md)
-```
-> Animated version: install [vhs](https://github.com/charmbracelet/vhs) and run `vhs demo.tape`.
+> Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
 
 Token-2022 extensions add powerful optional behaviors to a mint — several are fund-loss-grade when an authority is live or misconfigured (`PermanentDelegate` can seize balances, `TransferHook` can block transfers, `TransferFeeConfig` can be raised to 100%, `PausableConfig` can halt all transfers). Mintoscope audits that surface — the one no existing kit skill covers.
 
