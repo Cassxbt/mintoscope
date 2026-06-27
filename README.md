@@ -1,10 +1,33 @@
 # Mintoscope
 
-**A Claude Code / Codex skill that audits Solana Token-2022 (Token Extensions) mints for configuration risk — before you integrate one, or before you ship your own.**
+**The only risk auditor for Solana Token-2022 (Token Extensions) mints** — a Claude Code / Codex skill. It decomposes every extension authority (live vs renounced), flags the extension combinations the Token-2022 program itself rejects, and scores a mint SAFE → CRITICAL with a fix per finding — before you integrate one or ship your own.
 
 [![ci](https://github.com/Cassxbt/mintoscope/actions/workflows/ci.yml/badge.svg)](https://github.com/Cassxbt/mintoscope/actions/workflows/ci.yml) &nbsp;·&nbsp; [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) &nbsp;·&nbsp; ![runtime deps: 0](https://img.shields.io/badge/runtime%20deps-0-brightgreen.svg) &nbsp;·&nbsp; ![Claude Code / Codex](https://img.shields.io/badge/Claude%20Code%20%2F%20Codex-skill-8A2BE2.svg)
 
-Built by [@cassxbt](https://github.com/cassxbt), validated live against mainnet. Token-2022 extensions add powerful optional behaviors to a mint — several are fund-loss-grade when an authority is live or misconfigured (`PermanentDelegate` can seize balances, `TransferHook` can block transfers, `TransferFeeConfig` can be raised to 100%, `PausableConfig` can halt all transfers). Mintoscope audits that surface — the one no existing kit skill covers.
+Zero runtime dependencies · illegal-combo rules pinned to the Token-2022 program source · even PayPal's **PYUSD** audits **CRITICAL**.
+
+## Demo
+
+```text
+$ npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo
+
+**Verdict:** CRITICAL (score 100/100)
+
+### [CRITICAL] PermanentDelegate
+- Risk: The delegate can seize or burn any holder balance — full fund-seizure capability.
+- Authority: delegate = 2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk (live)
+- Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
+
+### [HIGH] MintAuthority
+### [HIGH] MintCloseAuthority
+### [HIGH] TransferFeeConfig
+### [HIGH] TransferHook
+### [HIGH] FreezeAuthority
+…  (full report: reports/pyusd.md)
+```
+> Animated version: install [vhs](https://github.com/charmbracelet/vhs) and run `vhs demo.tape`.
+
+Token-2022 extensions add powerful optional behaviors to a mint — several are fund-loss-grade when an authority is live or misconfigured (`PermanentDelegate` can seize balances, `TransferHook` can block transfers, `TransferFeeConfig` can be raised to 100%, `PausableConfig` can halt all transfers). Mintoscope audits that surface — the one no existing kit skill covers.
 
 ## What it does
 
@@ -57,16 +80,7 @@ As a skill, ask the agent: *"Audit Token-2022 mint `<address>`"* or *"Review my 
 
 ### Example — PYUSD (real mainnet)
 
-```
-**Verdict:** CRITICAL (score 100/100)
-
-### [CRITICAL] PermanentDelegate
-- Risk: The delegate can seize or burn any holder balance — full fund-seizure capability.
-- Authority: delegate = 2apBGMsS6ti9RyF5TwQTDswXBWskiJP2LD4cUEDqYJjk (live)
-- Fix: Renounce the permanent delegate unless seizure is an intended, disclosed feature.
-```
-
-PYUSD audits `CRITICAL` because it has live seize, mint, freeze, and close authorities — the capabilities of a regulated-issuer model. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller. Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
+The [Demo](#demo) above is real output. PYUSD audits `CRITICAL` because it has live seize, mint, freeze, and close authorities — the capabilities of a regulated-issuer model. **`CRITICAL` means capability, not intent** — Mintoscope reports the power an authority holds and lets you decide whether you trust the controller. Full generated report: [`reports/pyusd.md`](reports/pyusd.md).
 
 ## Validation
 
