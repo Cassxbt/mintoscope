@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="300" viewBox="0 0 820 300" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+  <rect width="820" height="300" rx="10" fill="#0d1117"/>
+  <rect width="820" height="36" rx="10" fill="#161b22"/>
+  <rect y="26" width="820" height="10" fill="#161b22"/>
+  <circle cx="22" cy="18" r="6" fill="#ff5f56"/>
+  <circle cx="42" cy="18" r="6" fill="#ffbd2e"/>
+  <circle cx="62" cy="18" r="6" fill="#27c93f"/>
+  <text x="410" y="23" fill="#8b949e" text-anchor="middle" font-size="13">mintoscope — npm run audit</text>
+
+  <g opacity="0">
+    <text x="20" y="72" fill="#c9d1d9"><tspan fill="#3fb950">$</tspan> npm run audit -- 2b1kV6Dk…CZfHsFu24GXo</text>
+    <animate attributeName="opacity" to="1" begin="0.2s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="106" fill="#c9d1d9">Verdict: <tspan fill="#f85149" font-weight="bold">CRITICAL</tspan> (score 100/100)</text>
+    <animate attributeName="opacity" to="1" begin="1.0s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="142" fill="#f85149" font-weight="bold">[CRITICAL] PermanentDelegate</text>
+    <animate attributeName="opacity" to="1" begin="1.5s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="166" fill="#8b949e">  ↳ can seize or burn any holder balance — authority live</text>
+    <animate attributeName="opacity" to="1" begin="1.8s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="200" fill="#d29922">[HIGH] MintAuthority · MintCloseAuthority</text>
+    <animate attributeName="opacity" to="1" begin="2.3s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="224" fill="#d29922">[HIGH] TransferFeeConfig · TransferHook · FreezeAuthority</text>
+    <animate attributeName="opacity" to="1" begin="2.7s" dur="0.3s" fill="freeze"/>
+  </g>
+  <g opacity="0">
+    <text x="20" y="260" fill="#8b949e">…  full report: reports/pyusd.md</text>
+    <animate attributeName="opacity" to="1" begin="3.2s" dur="0.3s" fill="freeze"/>
+  </g>
+
+  <rect x="20" y="278" width="9" height="2" fill="#3fb950">
+    <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+  </rect>
+</svg>

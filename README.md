@@ -8,6 +8,8 @@ Zero runtime dependencies · illegal-combo rules pinned to the Token-2022 progra
 
 ## Demo
 
+![Mintoscope audit demo](docs/demo.svg)
+
 ```text
 $ npm run audit -- 2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo
 
